@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'rack/handler/puma'
 require 'csv'
+require 'pg'
 
 get '/tests' do
   rows = CSV.read("./data.csv", col_sep: ';')
@@ -17,6 +18,10 @@ end
 
 get '/hello' do
   'Hello world!'
+end
+
+get '/' do
+  'Hello Sinatra :D !'
 end
 
 Rack::Handler::Puma.run(
