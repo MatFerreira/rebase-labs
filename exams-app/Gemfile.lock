@@ -1,6 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    macaddr (1.7.2)
+      systemu (~> 2.6.5)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.5.9)
@@ -16,7 +18,10 @@ GEM
       rack (~> 2.2, >= 2.2.4)
       rack-protection (= 3.0.6)
       tilt (~> 2.0)
+    systemu (2.6.5)
     tilt (2.2.0)
+    uuid (2.3.9)
+      macaddr (~> 1.0)
 
 PLATFORMS
   x86_64-linux
@@ -26,6 +31,7 @@ DEPENDENCIES
   puma
   rack
   sinatra
+  uuid
 
 BUNDLED WITH
    2.4.12

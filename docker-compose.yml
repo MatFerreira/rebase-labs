@@ -1,15 +1,14 @@
 services:
-  app:
-    build: .
-    ports:
-      - 3000:3000
-    # volumes:
-    #   - .:/app
-    depends_on:
-      - db
+  # app:
+  #   build: .
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - ./exams-app:/app
+  #   depends_on:
+  #     - db
   db:
     image: postgres
-    # restart: always
     environment:
       POSTGRES_DB: rebase-labs
       POSTGRES_PASSWORD: password
@@ -17,4 +16,3 @@ services:
       - 5432:5432
     volumes:
       - ./data:/var/lib/postgresql/data
-    # command: ["psql", "-U", "postgres", "-d", "rebase-labs", "-f", "./start.sql"]

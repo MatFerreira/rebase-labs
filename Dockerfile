@@ -1,6 +1,6 @@
 FROM ruby
 WORKDIR /app
-COPY . .
+COPY ./exams-app .
 RUN bundle install
-CMD [ "ruby", "server.rb" ]
+CMD [ "ruby", "src/server.rb"]
 EXPOSE 3000
