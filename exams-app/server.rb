@@ -6,7 +6,7 @@ require 'pg'
 conn = PG::Connection.new('localhost', 5432, nil, nil, 'rebase-labs', 'postgres', 'password')
 
 def get_doctor_by_crm(conn, crm)
-  result = conn.exec_params('SELECT * FROM doctors where crm = $1::text', [crm])
+  result = conn.exec_params('SELECT crm, crm_state, name, email FROM doctors where crm = $1::text', [crm])
   result[0]
 end
 
@@ -16,8 +16,8 @@ def get_all_tests_by_result_token(conn, token)
 end
 
 get '/exams' do
-  limit = params['limit'].to_i
-  page = params['page'].to_i
+  limit = params['limit'].to_i.abs
+  page = params['page'].to_i.abs
   offset = (page - 1) * limit
   has_next = false
 
@@ -36,6 +36,7 @@ get '/exams' do
     doctor = get_doctor_by_crm(conn, exam['doctor_crm'])
     exam['doctor'] = doctor
     exam['tests'] = tests
+    exam.delete('doctor_crm')
     exam
   end
 
