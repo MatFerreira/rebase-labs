@@ -24,7 +24,6 @@ async function loadPageData() {
   hasNext = exams["has_next"];
 }
 
-
 function buildExamCard(exam) {
   const examCard = document.createElement('div');
   examCard.innerHTML = `

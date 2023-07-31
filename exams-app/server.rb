@@ -43,6 +43,21 @@ get '/exams' do
   { data: exam_list, has_next: has_next}.to_json
 end
 
+get '/exams/:token' do
+  result = conn.exec_params("SELECT DISTINCT
+    exam_result_token, exam_date, patient_cpf, patients.name, patients.email, patients.birthdate, doctor_crm
+    FROM medicalexams
+    INNER JOIN patients ON cpf = patient_cpf
+    WHERE exam_result_token = $1", [params[:token]])
+  exam = result[0]
+  tests = get_all_tests_by_result_token(conn, exam['exam_result_token'])
+  doctor = get_doctor_by_crm(conn, exam['doctor_crm'])
+  exam['doctor'] = doctor
+  exam['tests'] = tests
+  exam.delete('doctor_crm')
+  exam.to_json
+end
+
 get '/' do
   erb :index
 end
