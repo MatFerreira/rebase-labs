@@ -13,15 +13,16 @@ async function getPage(pageNumber, limit) {
 
 async function loadPageData() {
   const page = await getPage(pageNumber, limit);
-  const exams = page.data
+  const exams = page.data;
+  let examList =  document.querySelector('section#exam-list');
 
   exams.forEach((exam) => {
     const examCard = buildExamCard(exam);
-    document.querySelector('section#exam-list').appendChild(examCard);
+    examList.appendChild(examCard);
   });
 
   pageNumber++;
-  hasNext = exams["has_next"];
+  hasNext = page["has_next"];
 }
 
 function buildExamCard(exam) {
@@ -61,7 +62,7 @@ function buildExamCard(exam) {
 
 loadPageData()
 window.addEventListener('scroll', () => {
-  if (document.documentElement.scrollHeight - window.innerHeight <= window.scrollY) {
+  if ((document.documentElement.scrollHeight - window.innerHeight <= window.scrollY) && (hasNext)) {
     loadPageData();
   }
 });
