@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'sinatra/cross_origin'
 require 'pg'
+require './import_from_csv.rb'
 
 class ExamApp < Sinatra::Base
   set :bind, '0.0.0.0'
@@ -61,6 +62,11 @@ class ExamApp < Sinatra::Base
 
   get '/' do
     erb :index
+  end
+
+  post '/import' do
+    file = params[:csv_file][:tempfile]
+    import_csv_data(file)
   end
 
   options "*" do

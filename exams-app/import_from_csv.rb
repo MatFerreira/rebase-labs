@@ -2,7 +2,6 @@ require 'csv'
 require 'pg'
 require 'uuid'
 
-
 def insert_doctor(conn, doctor)
   query = "INSERT INTO doctors VALUES(#{doctor.join(', ')}) ON CONFLICT DO NOTHING"
   conn.exec(query)
@@ -18,11 +17,11 @@ def insert_exam(conn, exam)
   conn.exec(query)
 end
 
-def main
-  rows = CSV.read('./data.csv', col_sep: ';')
+def import_csv_data(csv_file)
+  rows = CSV.parse(csv_file, col_sep: ';')
   columns = rows.shift
   begin
-    conn = PG::Connection.new('localhost', 5432, nil, nil, 'rebase-labs', 'postgres', 'password')
+    conn = PG::Connection.new('db', 5432, nil, nil, 'rebase-labs', 'postgres', 'password')
     conn.transaction do |con|
       rows.each do |row|
         uuid = UUID.new
@@ -36,14 +35,10 @@ def main
       end
     end
 
-    puts 'Sucesso'
-
+    'Importado com sucesso'
   rescue PG::Error => e
-    p e
-    puts 'Perdão pelo vacilo'
+    "Erro de importação\n #{e.to_s}"
   ensure
     conn&.close
   end
 end
-
-main()
