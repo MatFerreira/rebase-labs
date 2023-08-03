@@ -1,7 +1,7 @@
 require 'sinatra/base'
 require 'sinatra/cross_origin'
 require 'pg'
-require './import_from_csv.rb'
+require './import_from_csv'
 
 class ExamApp < Sinatra::Base
   set :bind, '0.0.0.0'
@@ -70,10 +70,10 @@ class ExamApp < Sinatra::Base
     import_csv_data(file)
   end
 
-  options "*" do
-    response.headers["Allow"] = "GET, PUT, POST, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, Accept, X-User-Email, X-Auth-Token"
-    response.headers["Access-Control-Allow-Origin"] = "*"
+  options '*' do
+    response.headers['Allow'] = 'GET, PUT, POST, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, Accept, X-User-Email, X-Auth-Token'
+    response.headers['Access-Control-Allow-Origin'] = '*'
     200
   end
 
@@ -85,7 +85,9 @@ class ExamApp < Sinatra::Base
   end
 
   def get_all_tests_by_result_token(token)
-    result = @@conn.exec_params('SELECT exam_type, exam_type_limits, exam_type_result from medicalexams where exam_result_token = $1::text', [token])
+    result = @@conn.exec_params(
+      'SELECT exam_type, exam_type_limits, exam_type_result from medicalexams where exam_result_token = $1::text', [token]
+    )
     (0..result.ntuples - 1).map { |n| result[n] }
   end
 

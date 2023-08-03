@@ -14,7 +14,7 @@ async function getPage(pageNumber, limit) {
 async function loadPageData() {
   const page = await getPage(pageNumber, limit);
   const exams = page.data;
-  let examList =  document.querySelector('section#exam-list');
+  let examList = document.querySelector('section#exam-list');
 
   exams.forEach((exam) => {
     const examCard = buildExamCard(exam);

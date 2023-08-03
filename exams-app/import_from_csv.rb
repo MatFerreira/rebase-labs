@@ -22,7 +22,7 @@ def import_csv_data(csv_file)
   columns = rows.shift
   begin
     conn = PG::Connection.new('db', 5432, nil, nil, 'rebase-labs', 'postgres', 'password')
-    conn.transaction do |con|
+    conn.transaction do |_con|
       rows.each do |row|
         uuid = UUID.new
         values = row.map { |v| "$$#{v}$$" }
@@ -37,7 +37,7 @@ def import_csv_data(csv_file)
 
     'Importado com sucesso'
   rescue PG::Error => e
-    "Erro de importação\n #{e.to_s}"
+    "Erro de importação\n #{e}"
   ensure
     conn&.close
   end
