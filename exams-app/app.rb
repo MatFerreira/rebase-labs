@@ -21,17 +21,15 @@ class ExamApp < Sinatra::Base
     limit = params['limit'].to_i.abs
     page = params['page'].to_i.abs
     offset = (page - 1) * limit
-    has_next = false
 
     exams = @@conn.exec_params("SELECT DISTINCT
       exam_result_token, exam_date, patient_cpf, patients.name, patients.email, patients.birthdate, doctor_crm
       FROM medicalexams
       INNER JOIN patients ON cpf = patient_cpf LIMIT $1::int OFFSET $2::int", [(limit + 1), offset])
 
-    if (exams.ntuples > limit)
-      has_next = true
-    end
+    return 404 if exams.ntuples == 0
 
+    has_next = (exams.ntuples > limit)
     exam_list = (0..limit - 1).map do |n|
       exam = exams[n]
       tests = get_all_tests_by_result_token(exam['exam_result_token'])
@@ -51,6 +49,9 @@ class ExamApp < Sinatra::Base
       FROM medicalexams
       INNER JOIN patients ON cpf = patient_cpf
       WHERE exam_result_token = $1", [params[:token]])
+
+    return 404 if result.ntuples == 0
+
     exam = result[0]
     tests = get_all_tests_by_result_token(exam['exam_result_token'])
     doctor = get_doctor_by_crm(exam['doctor_crm'])
