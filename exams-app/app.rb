@@ -7,7 +7,10 @@ class ExamApp < Sinatra::Base
   set :bind, '0.0.0.0'
   set :port, '3000'
 
-  @@conn = PG::Connection.new('db', 5432, nil, nil, 'rebase-labs', 'postgres', 'password')
+  def initialize
+    super
+    @conn = PG::Connection.new('db', 5432, nil, nil, 'rebase-labs', 'postgres', 'password')
+  end
 
   configure do
     enable :cross_origin
@@ -22,16 +25,18 @@ class ExamApp < Sinatra::Base
     page = params['page'].to_i.abs
     offset = (page - 1) * limit
 
-    exams = @@conn.exec_params("SELECT DISTINCT
+    result = @conn.exec_params(
+      "SELECT DISTINCT
       exam_result_token, exam_date, patient_cpf, patients.name, patients.email, patients.birthdate, doctor_crm
       FROM medicalexams
-      INNER JOIN patients ON cpf = patient_cpf LIMIT $1::int OFFSET $2::int", [(limit + 1), offset])
+      INNER JOIN patients ON cpf = patient_cpf LIMIT $1::int OFFSET $2::int",
+      [(limit + 1), offset]
+    )
 
-    return 404 if exams.ntuples == 0
-
-    has_next = (exams.ntuples > limit)
-    exam_list = (0..limit - 1).map do |n|
-      exam = exams[n]
+    has_next = (result.ntuples > limit)
+    range = has_next ? (0..limit - 1) : (0..result.ntuples - 1)
+    exam_list = range.map do |n|
+      exam = result[n]
       tests = get_all_tests_by_result_token(exam['exam_result_token'])
       doctor = get_doctor_by_crm(exam['doctor_crm'])
       exam['doctor'] = doctor
@@ -44,13 +49,16 @@ class ExamApp < Sinatra::Base
   end
 
   get '/exams/:token' do
-    result = @@conn.exec_params("SELECT DISTINCT
+    result = @conn.exec_params(
+      "SELECT DISTINCT
       exam_result_token, exam_date, patient_cpf, patients.name, patients.email, patients.birthdate, doctor_crm
       FROM medicalexams
       INNER JOIN patients ON cpf = patient_cpf
-      WHERE exam_result_token = $1", [params[:token]])
+      WHERE exam_result_token = $1",
+      [params[:token]]
+    )
 
-    return 404 if result.ntuples == 0
+    return 404 if result.ntuples.zero?
 
     exam = result[0]
     tests = get_all_tests_by_result_token(exam['exam_result_token'])
@@ -80,13 +88,17 @@ class ExamApp < Sinatra::Base
   private
 
   def get_doctor_by_crm(crm)
-    result = @@conn.exec_params('SELECT crm, crm_state, name, email FROM doctors where crm = $1::text', [crm])
+    result = @conn.exec_params(
+      'SELECT crm, crm_state, name, email FROM doctors where crm = $1::text',
+      [crm]
+    )
     result[0]
   end
 
   def get_all_tests_by_result_token(token)
-    result = @@conn.exec_params(
-      'SELECT exam_type, exam_type_limits, exam_type_result from medicalexams where exam_result_token = $1::text', [token]
+    result = @conn.exec_params(
+      'SELECT exam_type, exam_type_limits, exam_type_result from medicalexams where exam_result_token = $1::text',
+      [token]
     )
     (0..result.ntuples - 1).map { |n| result[n] }
   end

@@ -11,7 +11,7 @@ Implementação do projeto proposto no programa [Rebase Labs](https://git.campus
 + GET
     - `/`; Página inicial da aplicação. Retorna HTML com um script para consumir `/exams`
 
-    - `/exams?page&limit`; Requer os parâmetros `page` (número da página) e `limit` (quantidade de registros por página). Retorna uma página em json no formato:
+    - `/exams?page&limit`; Requer os parâmetros `page` (número da página) e `limit` (quantidade de registros por página). Retorna uma página em JSON no formato:
 
     ```json
     {
@@ -35,10 +35,8 @@ Implementação do projeto proposto no programa [Rebase Labs](https://git.campus
                         "exam_type_limits": "45-52",
                         "exam_type_result": "89"
                     },
-                    *...*
                 ]
             },
-            *...*
         ],
         "has_next": true
     }
